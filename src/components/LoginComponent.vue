@@ -22,19 +22,22 @@
       </select>
     </div>
     <div class="container__phone">
-      <input type="text" class="phoneCode" />
-      <input type="text" autofocus class="phone" />
+      <input type="text" class="phoneCode" v-model="code" />
+      <input type="text" autofocus class="phone" v-model="phone"/>
     </div>
     <div class="container__button">
-      <div id="sign-container"></div>
-      <button id="sign" class="next">INGRESAR</button>
+      <div id="p-captcha"></div>
+      <button id="sign" class="next" @click="loginWithPhoneNumber">INGRESAR</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, ref } from "vue";
+import { defineComponent, inject, ref, onMounted } from "vue";
 import IStorage from "@/interfaces/Storage";
+import { auth } from "../firebase"
+import { RecaptchaVerifier } from "firebase/auth";
+import { getAuth, signInWithPhoneNumber } from "firebase/auth";
 
 export default defineComponent({
   setup() {
@@ -42,6 +45,8 @@ export default defineComponent({
     console.log(Storage?.set("token", "12345"));
     const countries = ref<string>("CL");
     const code = ref<string>("+ 562");
+    const phone = ref<string>("");
+
     const searchCodes = async (): Promise<void> => {
       try {
         const response: any = await fetch(
@@ -54,10 +59,39 @@ export default defineComponent({
         console.error(error.message);
       }
     };
+    const loginWithPhoneNumber = async (): Promise<void> => {
+      try {
+        const phoneNumber = `${code.value}${phone.value}`;
+        const appVerifier: any = window.recaptchaVerifier;
+        const auth = getAuth();
+        const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+        if (confirmationResult) {
+          window.confirmationResult = confirmationResult;
+        }
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+
+    onMounted(() => {
+      window.recaptchaVerifier = new RecaptchaVerifier('p-captcha', {
+        'size': 'invisible',
+        'callback': (response: any) => {
+          // reCAPTCHA solved, allow signInWithPhoneNumber.
+          console.log('--------');
+          console.log(response);
+          console.log('--------');
+          //onSignInSubmit();
+        }
+      }, auth);
+    });
+
     return {
       countries,
       code,
+      phone,
       searchCodes,
+      loginWithPhoneNumber
     };
   },
 
@@ -65,7 +99,9 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style lang="css" scoped>
+@import '../assets/variables.css';
+
 .login {
   background: #212121;
   height: 100vh;
@@ -96,7 +132,9 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   color: #fff;
+  font-family: var(--fontFamily);
 }
+
 .title {
   margin-top: 15px;
   font-size: 1.8rem;
@@ -136,6 +174,7 @@ select {
   justify-content: center;
   padding-top: 15px;
 }
+
 .phoneCode {
   width: 50px;
   padding: 10px;
@@ -164,6 +203,7 @@ select {
   justify-content: center;
   margin-top: 40px;
 }
+
 .next {
   text-align: center;
   width: 250px;
