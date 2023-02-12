@@ -29,7 +29,7 @@ export default createStore({
         const aMessages: IMessage[] = [];
         const cMessages = await db
           .collection("messages")
-          .orderBy("date")
+          .orderBy("date", "desc")
           .where("userUid", "in", [state.userUid, state.logged])
           .get();
         cMessages.forEach((data) => {
