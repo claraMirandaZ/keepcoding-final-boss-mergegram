@@ -2,7 +2,7 @@ interface Message {
     userUid: string
     type: string
     text: string
-    date: string
+    date: any
 }
 
 export default Message

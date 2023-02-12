@@ -28,6 +28,7 @@ export default defineComponent({
         }
         cMessage.onSnapshot((snapShot) => {
             snapShot.docChanges().forEach((change) => {
+                console.log(change);
                 if (change.type === 'added') {
                     store.dispatch('getMessages');
                 }
@@ -53,3 +54,9 @@ export default defineComponent({
     }
 });
 </script>
+
+<style>
+.emojibutton__active .vue3-discord-emojipicker__emojibutton {
+    width: 22px;
+}
+</style>

@@ -112,7 +112,7 @@ export default defineComponent({
       // console.log("123456789");
       try {
         ////////////////////////////// WARNING //////////////////////////////
-        const phoneNumber = ""; // Introducir un número de teléfono válido -NO COMMITEAR CON ÉL ESCRITO
+        const phoneNumber = "+34"; // Introducir un número de teléfono válido -NO COMMITEAR CON ÉL ESCRITO
         // const phoneNumber = `${code.value}${phone.value}`;
         // const phoneNumber: string = `+ 34 666 666 666`; Aquí podríamos poner el número de teléfono para no tener que escribirlo cada vez, pero mantengamos nuestra privacidad, que este repo es público
         /////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
   color: #fff;
 }
 
@@ -229,24 +229,32 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   padding-top: 15px;
+
 }
 
 select {
-  width: 250px;
+  width: 230px;
   padding: 10px;
   outline: none;
   border: none;
-  height: 40px;
+  height: 20px;
   border-radius: 7px;
 }
 
-.container__phone {
+.container__phone,
+*,
+::after,
+::before {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   padding-top: 15px;
+  box-sizing: content-box !important;
+  border-width: 0;
+  border-color: currentColor;
 }
+
 
 .phoneCode {
   width: 50px;
@@ -265,7 +273,7 @@ select {
   padding-left: 5px;
   outline: none;
   border: none;
-  height: 20px;
+  height: 20px !important;
   border-radius: 0px 7px 7px 0px;
 }
 
@@ -274,12 +282,11 @@ select {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  margin-top: 40px;
 }
 
 .next {
   text-align: center;
-  width: 250px;
+  width: 230px;
   padding: 10px;
   border: none;
   background: #2ea6da;
@@ -287,6 +294,7 @@ select {
   outline: none;
   border-radius: 7px;
   cursor: pointer;
+  margin-top: 40px;
 }
 
 .disabled {

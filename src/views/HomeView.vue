@@ -39,7 +39,8 @@ export default defineComponent({
 .home {
   background: var(--backgroundColor);
   width: 100%;
-  height: 100vh;
+  height: 100%;
+
   color: var(--fontColor);
   display: flex;
   flex-direction: row;
@@ -56,6 +57,6 @@ export default defineComponent({
 .messages {
   width: 65%;
   background: var(--backgroundColorMessages);
-  height: 100vh;
+  height: 100%;
 }
 </style>
