@@ -60,6 +60,10 @@
       <input type="text" class="phoneCode" v-model="codeUY" />
       <input type="text" autofocus class="phone" v-model="phone" />
     </div>
+    <div class="container__phone">
+      <input type="text" class="phoneCode" value="Code"/>
+      <input type="text" class="phone" v-model="smsCode" />
+    </div>
     <div class="container__button">
       <div id="p-captcha"></div>
       <button id="sign" class="next" @click="loginWithPhoneNumber">
@@ -81,6 +85,7 @@ export default defineComponent({
     const countries = ref<string>("ES");
     const code = ref<string>("+ 34");
     const phone = ref<string>("");
+    const smsCode = ref<string>("");
     const Storage = inject<IStorage>("Storage");
     // console.log(Storage?.set("token", "12345"));
     const codeAR = ref<string>("+ 54");
@@ -112,8 +117,8 @@ export default defineComponent({
       // console.log("123456789");
       try {
         ////////////////////////////// WARNING //////////////////////////////
-        const phoneNumber = "+34"; // Introducir un número de teléfono válido -NO COMMITEAR CON ÉL ESCRITO
-        // const phoneNumber = `${code.value}${phone.value}`;
+        //const phoneNumber = "+34"; // Introducir un número de teléfono válido -NO COMMITEAR CON ÉL ESCRITO
+        const phoneNumber = `${code.value}${phone.value}`;
         // const phoneNumber: string = `+ 34 666 666 666`; Aquí podríamos poner el número de teléfono para no tener que escribirlo cada vez, pero mantengamos nuestra privacidad, que este repo es público
         /////////////////////////////////////////////////////////////////////
         const appVerifier: any = window.recaptchaVerifier;
@@ -122,8 +127,8 @@ export default defineComponent({
           .signInWithPhoneNumber(phoneNumber, appVerifier);
         if (response) {
           window.confirmationResult = response;
-          const code = "914766";
-          const confirmation = await response.confirm(code);
+          const phoneSmsCode = `${smsCode.value}`;
+          const confirmation = await response.confirm(phoneSmsCode);
           if (confirmation) {
             // ¡El usuario se ha logueado correctamente!
             // const user = confirmation.user; o bien:
@@ -158,6 +163,7 @@ export default defineComponent({
       countries,
       code,
       phone,
+      smsCode,
       searchCodes,
       loginWithPhoneNumber,
       codeAR,
