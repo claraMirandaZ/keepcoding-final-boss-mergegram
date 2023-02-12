@@ -7,9 +7,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "vue";
+import { defineComponent, computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import MessageDetail from '@/components/Messages/MessageDetail.vue';
+
+
 
 export default defineComponent({
     name: "MessageList",
@@ -19,12 +21,22 @@ export default defineComponent({
     setup() {
         const store = useStore();
         const aMessages = computed(() => store.state.messages);
+        const container = ref<HTMLDivElement>();
+        onMounted(() => {
+            container.value?.scrollTo({
+                top: container.value?.scrollHeight || 0,
+                behavior: 'smooth',
+            });
+        });
         return {
             //chat,
             aMessages,
+            container,
         };
     },
+
 });
+
 </script>
 
 <style lang="css" scoped>
@@ -37,7 +49,7 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    overflow: scroll;
+    overflow-y: scroll;
 }
 
 .container-messages::-webkit-scrollbar {
