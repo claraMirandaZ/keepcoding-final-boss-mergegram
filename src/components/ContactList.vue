@@ -14,10 +14,11 @@
             </span>
             <span class="message-time">
               {{
-  new Date((user.lastMessageDate?.seconds ?? new Date().getTime() / 1000) * 1000).toLocaleString('es-ES', {
-    timeZone:
-      'Europe/Madrid', hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short', weekday: 'short'
-  })
+  user.lastMessageDate ?
+    new Date((user.lastMessageDate?.seconds) * 1000).toLocaleString('es-ES', {
+      timeZone:
+        'Europe/Madrid', hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short', weekday: 'short'
+    }) : ""
               }}
             </span>
           </div>
@@ -58,8 +59,9 @@ export default defineComponent({
 
         const cMessages = await db
           .collection("messages")
-          .orderBy("date")
+          .orderBy("date", "desc")
           .where("userUid", "==", userUid)
+          .limit(1)
           .get();
 
         cMessages.forEach((data) => {
@@ -72,9 +74,13 @@ export default defineComponent({
           });
         });
 
-        const lastMessageDate = aMessages[aMessages.length - 1].date;
-        const lastMessageText = aMessages[aMessages.length - 1].text;
+        let lastMessageDate: any;
+        let lastMessageText = "";
 
+        if (aMessages.length > 0) {
+          lastMessageDate = aMessages[0].date;
+          lastMessageText = aMessages[0].text;
+        }
 
         aUsers.value.push({
           photo,
