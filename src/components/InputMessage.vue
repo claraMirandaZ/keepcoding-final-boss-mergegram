@@ -24,11 +24,11 @@ export default defineComponent({
         const cMessage = db.collection('messages');
 
         const setEmoji = (emoji: any): void => {
-            console.log(emoji);
+            //console.log(emoji);
         }
         cMessage.onSnapshot((snapShot) => {
             snapShot.docChanges().forEach((change) => {
-                console.log(change);
+                //console.log(change);
                 if (change.type === 'added') {
                     store.dispatch('getMessages');
                 }
