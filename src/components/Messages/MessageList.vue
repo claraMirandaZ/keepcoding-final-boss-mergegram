@@ -1,7 +1,6 @@
 
 <template>
     <div class="container-messages">
-        Esta es la lista de mensajes de ese usuario.
         <MessageDetail v-for="message in aMessages" :message="message" :key="message.userUid" />
     </div>
 </template>

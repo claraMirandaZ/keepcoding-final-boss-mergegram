@@ -3,7 +3,7 @@
     <ul class="contactList">
       <li :class="{
         active: loggedPhone === user.userUid
-      }" v-for="user in aUsers" :key="user.userUid" @click="setUserUid(user)">
+      }" v-for="user in orderedUsers" :key="user.userUid" @click="setUserUid(user)">
         <img :src="user.photo" :alt="`Avatar de ${user.name}`" :title="`Avatar de ${user.name}`" width="65"
           height="65" />
         <section class="info">
@@ -13,13 +13,7 @@
               {{ user.lastMessageText + ' ' }}
             </span>
             <span class="message-time">
-              {{
-  user.lastMessageDate ?
-    new Date((user.lastMessageDate?.seconds) * 1000).toLocaleString('es-ES', {
-      timeZone:
-        'Europe/Madrid', hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short', weekday: 'short'
-    }) : ""
-              }}
+              {{ getTimeStamp(user.lastMessageDate) }}
             </span>
           </div>
         </section>
@@ -47,6 +41,31 @@ export default defineComponent({
       store.dispatch('getMessages');
     };
 
+    // trae los segundos de timestamp de firebase y convierte de string a int
+    const getSecondsDb = (timestamp: any) => {
+      if (timestamp != undefined)
+        return parseInt(timestamp.seconds);
+      else
+        return 1;
+    };
+    // trae el timestamp de firebase y lo convierte a formato fecha de España.
+    const getTimeStamp = (timestamp: any) => {
+      let date: Date | undefined;
+
+      if (timestamp != undefined)
+        date = new Date(timestamp.seconds * 1000);
+      else
+        date = undefined;
+
+      if (date != undefined)
+        return date.toLocaleString('es-ES', {
+          timeZone:
+            'Europe/Madrid', hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short', weekday: 'short'
+        });
+      else
+        return "";
+    };
+
     onMounted(async () => {
       const querySnapshot: firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData> = await cUsers.get();
       querySnapshot.forEach(async (data: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>) => {
@@ -57,6 +76,7 @@ export default defineComponent({
 
         const aMessages: IMessage[] = [];
 
+        // trae los mensajes de la base de datos
         const cMessages = await db
           .collection("messages")
           .orderBy("date", "desc")
@@ -64,6 +84,7 @@ export default defineComponent({
           .limit(1)
           .get();
 
+        // por cada mensaje, se guarda la información en un array de mensajes
         cMessages.forEach((data) => {
           const { date, type, text, userUid } = data.data();
           aMessages.push({
@@ -74,6 +95,7 @@ export default defineComponent({
           });
         });
 
+        // crea dos variables y se trae la fecha y el texto del último mensaje.
         let lastMessageDate: any;
         let lastMessageText = "";
 
@@ -91,16 +113,25 @@ export default defineComponent({
           lastMessageText
         });
       });
-
-
     });
 
     return {
       aUsers,
       loggedPhone,
-      setUserUid
+      setUserUid,
+      getTimeStamp,
+      getSecondsDb
     };
   },
+  // crea una variable orderedUsers donde se guardan en orden los mensajes traidos de fb.
+  computed: {
+    orderedUsers: function (): IUser[] {
+      return this.aUsers.slice().sort((a: IUser, b: IUser) => {
+        return this.getSecondsDb(b.lastMessageDate) -
+          this.getSecondsDb(a.lastMessageDate);
+      });
+    }
+  }
 });
 </script>
 
@@ -142,6 +173,9 @@ img {
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .name {
@@ -150,6 +184,7 @@ img {
 
 .lastMessage {
   font-size: 14px;
+
 }
 
 .active {
